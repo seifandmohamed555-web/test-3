@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAP Supplies - لوحة تحكم الإدارة</title>
+    <meta name="description" content="لوحة تحكم الإدارة - منصة توريدات MAP">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="admin-styles.css">
+    <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+</head>
+
+<body>
+    <!-- صفحة تسجيل الدخول بالرمز السري -->
+    <div id="admin-login-page" class="page active">
+        <div class="admin-login-container">
+            <div class="admin-login-card">
+                <div class="admin-logo">
+                    <img src="6024030016393382674.jpg" alt="MAP Supplies Logo" class="admin-logo-img">
+                    <p class="admin-subtitle">لوحة تحكم الإدارة</p>
+                </div>
+
+                <form id="admin-code-form" onsubmit="verifyAdminCode(event)">
+                    <div class="form-group">
+                        <label for="admin-code">الرمز السري</label>
+                        <input type="password" id="admin-code" required placeholder="أدخل الرمز السري"
+                            autocomplete="off" maxlength="10">
+                        <small class="form-hint">أدخل الرمز السري للوصول إلى لوحة التحكم</small>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">دخول</button>
+                </form>
+
+                <div class="admin-footer">
+                    <p>الرمز السري: <code>map2026</code></p>
+                    <a href="index.html" class="link">← العودة للصفحة الرئيسية</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- صفحة اختيار نوع الدخول -->
+    <div id="admin-role-page" class="page">
+        <div class="admin-login-container">
+            <div class="admin-login-card">
+                <button class="back-btn" onclick="backToCodePage()">← العودة</button>
+                <div class="admin-header">
+                    <h2>اختر نوع الحساب</h2>
+                    <p>يرجى اختيار نوع الحساب للدخول</p>
+                </div>
+
+                <div class="role-selection">
+                    <button class="role-card" onclick="showAdminLoginForm()">
+                        <div class="role-icon">👑</div>
+                        <h3>المدير الرئيسي</h3>
+                        <p>صلاحيات كاملة على النظام</p>
+                    </button>
+
+                    <button class="role-card" onclick="showSupervisorLoginForm()">
+                        <div class="role-icon">👤</div>
+                        <h3>مشرف فرعي</h3>
+                        <p>صلاحيات محدودة</p>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- صفحة تسجيل دخول المدير الرئيسي -->
+    <div id="admin-main-login-page" class="page">
+        <div class="admin-login-container">
+            <div class="admin-login-card">
+                <button class="back-btn" onclick="backToRolePage()">← العودة</button>
+                <div class="admin-header">
+                    <div class="role-icon">👑</div>
+                    <h2>دخول المدير الرئيسي</h2>
+                    <p>أدخل الرمز السري الخاص بالمدير</p>
+                </div>
+
+                <form id="admin-main-login-form" onsubmit="handleAdminLogin(event)">
+                    <div class="form-group">
+                        <label for="admin-main-code">الرمز السري للمدير</label>
+                        <input type="password" id="admin-main-code" required placeholder="أدخل الرمز الخاص بالمدير">
+                        <small class="form-hint">ملاحظة: الرمز مختلف عن رمز الوصول الأول</small>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">دخول</button>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- صفحة تسجيل دخول المشرف الفرعي -->
+    <div id="supervisor-login-page" class="page">
+        <div class="admin-login-container">
+            <div class="admin-login-card">
+                <button class="back-btn" onclick="backToRolePage()">← العودة</button>
+                <div class="admin-header">
+                    <div class="role-icon">👤</div>
+                    <h2>تسجيل دخول المشرف الفرعي</h2>
+                    <p>أدخل بيانات الدخول الخاصة بك</p>
+                </div>
+
+                <form id="supervisor-login-form" onsubmit="handleSupervisorLogin(event)">
+                    <div class="form-group">
+                        <label for="supervisor-email">البريد الإلكتروني</label>
+                        <input type="email" id="supervisor-email" required placeholder="supervisor@mapsupplies.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="supervisor-password">كلمة المرور</label>
+                        <input type="password" id="supervisor-password" required placeholder="••••••••">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">تسجيل الدخول</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- لوحة تحكم الإدارة -->
+    <div id="admin-dashboard" class="page">
+        <header class="dashboard-header admin-header">
+            <div class="container">
+                <div class="logo">
+                    <img src="6024030016393382674.jpg" alt="MAP Supplies Logo" class="logo-img">
+                </div>
+                <nav class="dashboard-nav">
+                    <a href="#" class="nav-link active" id="nav-dashboard" onclick="showAdminSection('dashboard')">لوحة
+                        التحكم</a>
+                    <a href="#" class="nav-link" id="nav-orders" onclick="showAdminSection('orders')">إدارة الطلبات</a>
+                    <a href="#" class="nav-link" id="nav-customers" onclick="showAdminSection('customers')">العملاء</a>
+                    <a href="#" class="nav-link" id="nav-supervisors"
+                        onclick="showAdminSection('supervisors')">المشرفين</a>
+                    <a href="#" class="nav-link" id="nav-categories" onclick="showAdminSection('categories')">إدارة
+                        الفئات</a>
+                    <a href="#" class="nav-link" id="nav-notifications"
+                        onclick="showAdminSection('notifications')">الإشعارات</a>
+                    <a href="#" class="nav-link" id="nav-settings" onclick="showAdminSection('settings')">الإعدادات</a>
+                </nav>
+                <div class="user-menu">
+                    <span class="user-name" id="admin-user-name">المدير الرئيسي</span>
+                    <button class="btn btn-secondary btn-sm" onclick="handleAdminLogout()">تسجيل الخروج</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="dashboard-main">
+            <!-- قسم لوحة التحكم -->
+            <section id="admin-dashboard" class="dashboard-section active">
+                <div class="container">
+                    <h2 class="page-title">الإحصائيات</h2>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">📋</div>
+                            <div class="stat-content">
+                                <h3 id="admin-total-orders">0</h3>
+                                <p>إجمالي الطلبات</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">👥</div>
+                            <div class="stat-content">
+                                <h3 id="admin-total-customers">0</h3>
+                                <p>إجمالي العملاء</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">⏳</div>
+                            <div class="stat-content">
+                                <h3 id="admin-pending-orders">0</h3>
+                                <p>طلبات معلقة</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">💰</div>
+                            <div class="stat-content">
+                                <h3 id="admin-total-sales">0 ج.م</h3>
+                                <p>إجمالي المبيعات</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="stats-grid" style="margin-top: 24px;">
+                        <div class="stat-card">
+                            <div class="stat-icon">✅</div>
+                            <div class="stat-content">
+                                <h3 id="admin-approved-orders">0</h3>
+                                <p>طلبات موافق عليها</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">🚚</div>
+                            <div class="stat-content">
+                                <h3 id="admin-shipped-orders">0</h3>
+                                <p>طلبات مشحونة</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">📊</div>
+                            <div class="stat-content">
+                                <h3 id="admin-quote-rate">0%</h3>
+                                <p>معدل قبول العروض</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">📈</div>
+                            <div class="stat-content">
+                                <h3 id="admin-avg-order">0 ج.م</h3>
+                                <p>متوسط قيمة الطلب</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="recent-activity">
+                        <h3>النشاط الأخير</h3>
+                        <div id="recent-activity-list" class="activity-list">
+                            <p class="empty-state">لا يوجد نشاط حديث</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- قسم إدارة الطلبات -->
+            <section id="admin-orders" class="dashboard-section">
+                <div class="container">
+                    <h2 class="page-title">إدارة الطلبات</h2>
+                    <div class="filters-bar">
+                        <input type="text" id="admin-search" placeholder="بحث برقم الطلب أو اسم العميل"
+                            onkeyup="searchOrders()">
+                        <select id="admin-status-filter" onchange="filterAdminOrders()">
+                            <option value="all">جميع الحالات</option>
+                            <option value="pending">معلق</option>
+                            <option value="reviewing">قيد المراجعة</option>
+                            <option value="quoted">مسعر</option>
+                            <option value="approved">موافق عليه</option>
+                            <option value="preparing">قيد التحضير</option>
+                            <option value="shipped">مشحون</option>
+                            <option value="delivered">مسلم</option>
+                            <option value="cancelled">ملغي</option>
+                        </select>
+                        <input type="date" id="admin-date-filter" onchange="filterAdminOrders()">
+                        <button class="btn btn-secondary" onclick="resetFilters()">إعادة تعيين</button>
+                    </div>
+                    <div id="admin-orders-list" class="admin-orders-list">
+                        <p class="empty-state">لا توجد طلبات</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- قسم العملاء -->
+            <section id="admin-customers" class="dashboard-section">
+                <div class="container">
+                    <h2 class="page-title">إدارة العملاء</h2>
+                    <div class="filters-bar">
+                        <input type="text" id="customers-search" placeholder="بحث باسم الشركة أو البريد الإلكتروني"
+                            onkeyup="searchCustomers()">
+                        <select id="customers-status-filter" onchange="filterCustomers()">
+                            <option value="all">جميع العملاء</option>
+                            <option value="active">نشط</option>
+                            <option value="blocked">محظور</option>
+                        </select>
+                    </div>
+                    <div id="customers-list" class="customers-list">
+                        <p class="empty-state">لا يوجد عملاء</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- قسم المشرفين -->
+            <section id="admin-supervisors" class="dashboard-section">
+                <div class="container">
+                    <h2 class="page-title">إدارة المشرفين الفرعيين</h2>
+                    <button class="btn btn-primary" onclick="showAddSupervisorModal()">+ إضافة مشرف جديد</button>
+                    <div id="supervisors-list" class="supervisors-list">
+                        <p class="empty-state">لا يوجد مشرفين</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- قسم الإشعارات -->
+            <section id="admin-notifications" class="dashboard-section">
+                <div class="container">
+                    <h2 class="page-title">سجل الإشعارات</h2>
+                    <div class="notification-settings">
+                        <h3>إعدادات الرسائل</h3>
+                        <form id="notification-template-form" onsubmit="saveNotificationTemplate(event)">
+                            <div class="form-group">
+                                <label for="notification-template">نص الرسالة الافتراضي</label>
+                                <textarea id="notification-template"
+                                    rows="4">مرحباً [اسم العميل]، تم إضافة عرض سعر جديد لطلبكم رقم #[رقم الطلب]. يرجى تسجيل الدخول لمراجعة التفاصيل. - فريق MAP Supplies</textarea>
+                                <small class="form-hint">استخدم [اسم العميل] و [رقم الطلب] كمتغيرات</small>
+                            </div>
+                            <button type="submit" class="btn btn-primary">حفظ القالب</button>
+                        </form>
+                    </div>
+                    <div class="filters-bar">
+                        <select id="notifications-status-filter" onchange="filterNotifications()">
+                            <option value="all">جميع الإشعارات</option>
+                            <option value="sent">مرسلة</option>
+                            <option value="failed">فشلت</option>
+                        </select>
+                    </div>
+                    <div id="notifications-log" class="notifications-log">
+                        <p class="empty-state">لا توجد إشعارات</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- قسم إدارة الفئات -->
+            <section id="admin-categories" class="dashboard-section">
+                <div class="container">
+                    <h2 class="page-title">إدارة فئات المنتجات</h2>
+                    <div class="settings-card">
+                        <h3>إضافة فئة جديدة</h3>
+                        <form id="add-category-form" onsubmit="handleAddCategory(event)">
+                            <div class="form-row">
+                                <div class="form-col">
+                                    <div class="form-group">
+                                        <label for="category-name">اسم الفئة *</label>
+                                        <input type="text" id="category-name" required placeholder="مثال: أدوات مكتبية">
+                                    </div>
+                                </div>
+                                <div class="form-col">
+                                    <div class="form-group">
+                                        <label for="category-icon">أيقونة الفئة (Emoji) *</label>
+                                        <input type="text" id="category-icon" required placeholder="مثال: 📦">
+                                    </div>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary">إضافة الفئة</button>
+                        </form>
+                    </div>
+
+                    <div class="recent-activity" style="margin-top: 24px;">
+                        <h3>الفئات الحالية</h3>
+                        <div id="categories-list-admin" class="activity-list">
+                            <!-- سيتم ملؤها برمجياً -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- قسم الإعدادات -->
+            <section id="admin-settings" class="dashboard-section">
+                <div class="container">
+                    <h2 class="page-title">إعدادات النظام</h2>
+                    <div class="settings-card">
+                        <h3>معلومات المنصة</h3>
+                        <p><strong>الاسم:</strong> MAP Supplies - توريدات MAP</p>
+                        <p><strong>الإصدار:</strong> 1.0.0</p>
+                        <p><strong>تاريخ الإطلاق:</strong> 2026</p>
+                        <p><strong>الرمز السري:</strong> map2026</p>
+                    </div>
+
+                    <div class="settings-card">
+                        <h3>إحصائيات النظام</h3>
+                        <p><strong>إجمالي الطلبات:</strong> <span id="settings-total-orders">0</span></p>
+                        <p><strong>إجمالي العملاء:</strong> <span id="settings-total-customers">0</span></p>
+                        <p><strong>إجمالي المشرفين:</strong> <span id="settings-total-supervisors">0</span></p>
+                        <p><strong>إجمالي الإشعارات:</strong> <span id="settings-total-notifications">0</span></p>
+                    </div>
+
+                    <div class="settings-card">
+                        <h3>إدارة البيانات</h3>
+                        <button class="btn btn-secondary" onclick="exportData()">تصدير البيانات (JSON)</button>
+                        <button class="btn btn-secondary" onclick="clearAllData()" style="margin-top: 8px;">مسح جميع
+                            البيانات</button>
+                        <small class="form-hint" style="display: block; margin-top: 8px;">تحذير: مسح البيانات لا يمكن
+                            التراجع عنه</small>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modal لإضافة عرض سعر -->
+    <div id="quote-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>إضافة عرض سعر</h3>
+                <button class="close-btn" onclick="closeQuoteModal()">&times;</button>
+            </div>
+            <div id="quote-order-details" class="order-details-preview"></div>
+            <form id="quote-form" onsubmit="submitQuote(event)">
+                <input type="hidden" id="quote-order-id">
+                <div class="form-group">
+                    <label for="quote-price">السعر (ج.م) *</label>
+                    <input type="number" id="quote-price" required min="0" step="0.01" placeholder="0.00">
+                </div>
+                <div class="form-group">
+                    <label for="quote-delivery">مدة التسليم المتوقعة *</label>
+                    <input type="text" id="quote-delivery" required placeholder="مثال: 7-10 أيام">
+                </div>
+                <div class="form-group">
+                    <label for="quote-payment">شروط الدفع *</label>
+                    <select id="quote-payment" required>
+                        <option value="">اختر شروط الدفع</option>
+                        <option value="cash">نقداً</option>
+                        <option value="30days">30 يوم</option>
+                        <option value="60days">60 يوم</option>
+                        <option value="installments">أقساط</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="quote-notes">ملاحظات إضافية</label>
+                    <textarea id="quote-notes" rows="3" placeholder="أي تفاصيل إضافية"></textarea>
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="btn btn-primary">إرسال عرض السعر</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeQuoteModal()">إلغاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal لإضافة مشرف -->
+    <div id="supervisor-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>إضافة مشرف فرعي</h3>
+                <button class="close-btn" onclick="closeSupervisorModal()">&times;</button>
+            </div>
+            <form id="supervisor-form" onsubmit="addSupervisor(event)">
+                <div class="form-group">
+                    <label for="supervisor-name">الاسم *</label>
+                    <input type="text" id="supervisor-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="supervisor-email-add">البريد الإلكتروني *</label>
+                    <input type="email" id="supervisor-email-add" required>
+                </div>
+                <div class="form-group">
+                    <label for="supervisor-password-add">كلمة المرور *</label>
+                    <input type="password" id="supervisor-password-add" required minlength="8">
+                </div>
+                <div class="form-group">
+                    <label>الصلاحيات</label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" checked disabled>
+                        <span>عرض الطلبات</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" checked disabled>
+                        <span>إضافة عروض أسعار</span>
+                    </label>
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="btn btn-primary">إضافة المشرف</button>
+                    <button type="button" class="btn btn-secondary" onclick="closeSupervisorModal()">إلغاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast للإشعارات -->
+    <div id="toast" class="toast"></div>
+
+    <script src="db.js"></script>
+    <script src="admin-script.js"></script>
+</body>
+
+</html>

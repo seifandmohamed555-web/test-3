@@ -1,0 +1,498 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAP Supplies – توريدات MAP</title>
+    <meta name="description" content="منصة توريدات MAP للتجارة الإلكترونية B2B">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <!-- EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+</head>
+
+<body>
+    <!-- صفحة الهبوط الرئيسية -->
+    <div id="landing-page" class="page active">
+        <header class="landing-header">
+            <div class="container">
+                <div class="logo">
+                    <img src="6024030016393382674.jpg" alt="MAP Supplies Logo" class="logo-img">
+                    <p class="tagline">توريدات MAP - شريكك الموثوق في التوريدات</p>
+                </div>
+                <nav class="landing-nav">
+                    <button class="btn btn-secondary" onclick="showLoginPage()">تسجيل الدخول</button>
+                    <button class="btn btn-primary" onclick="showRegisterPage()">تسجيل جديد</button>
+                </nav>
+            </div>
+        </header>
+
+        <section class="hero">
+            <div class="container">
+                <div class="hero-content">
+                    <h2 class="hero-title">منصة التوريدات الأولى في مصر</h2>
+                    <p class="hero-subtitle">احصل على أفضل عروض الأسعار من موردين موثوقين</p>
+                    <div class="hero-buttons">
+                        <button class="btn btn-primary btn-lg" onclick="showRegisterPage()">ابدأ الآن مجاناً</button>
+                        <button class="btn btn-outline btn-lg" onclick="scrollToFeatures()">اعرف المزيد</button>
+                    </div>
+                </div>
+                <div class="hero-image">
+                    <div class="hero-illustration">
+                        <img src="6024030016393382674.jpg" alt="Logo"
+                            style="max-width: 80%; max-height: 80%; object-fit: contain; border-radius: 20px;">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="features" class="features">
+            <div class="container">
+                <h2 class="section-title">لماذا MAP Supplies؟</h2>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">📦</div>
+                        <h3>طلبات سهلة</h3>
+                        <p>أرسل طلباتك بسهولة واحصل على عروض أسعار متعددة</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">💰</div>
+                        <h3>أفضل الأسعار</h3>
+                        <p>قارن بين عروض الأسعار واختر الأنسب لك</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">⚡</div>
+                        <h3>سرعة في التنفيذ</h3>
+                        <p>متابعة فورية لطلباتك وتحديثات مستمرة</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🔒</div>
+                        <h3>أمان وموثوقية</h3>
+                        <p>بياناتك محمية ومعاملاتك آمنة</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <footer class="landing-footer">
+            <div class="container">
+                <p>&copy; 2026 MAP Supplies. جميع الحقوق محفوظة.</p>
+                <p style="margin-top: 8px;"><a href="admin.html" class="link" style="color: #94a3b8;">لوحة تحكم
+                        الإدارة</a></p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- صفحة تسجيل الدخول -->
+    <div id="login-page" class="page">
+        <div class="auth-container">
+            <div class="auth-card">
+                <button class="back-btn" onclick="showLandingPage()">← العودة</button>
+                <div class="auth-header">
+                    <h2>تسجيل الدخول</h2>
+                    <p>مرحباً بعودتك إلى MAP Supplies</p>
+                </div>
+                <form id="login-form" onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label for="login-email">البريد الإلكتروني</label>
+                        <input type="email" id="login-email" required placeholder="example@company.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">كلمة المرور</label>
+                        <input type="password" id="login-password" required placeholder="••••••••">
+                    </div>
+                    <div class="form-footer">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="remember-me">
+                            <span>تذكرني</span>
+                        </label>
+                        <a href="#" class="link" onclick="showForgotPassword()">نسيت كلمة المرور؟</a>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">تسجيل الدخول</button>
+                </form>
+                <div class="auth-footer">
+                    <p>ليس لديك حساب؟ <a href="#" class="link" onclick="showRegisterPage()">سجل الآن</a></p>
+                </div>
+            </div>
+
+            <!-- أيقونة دخول الإدارة -->
+            <button class="admin-access-btn" onclick="showAdminAccessModal()" title="دخول الإدارة">
+                🔐
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal لإدخال رمز الإدارة -->
+    <div id="admin-access-modal" class="modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h3>🔐 دخول لوحة الإدارة</h3>
+                <button class="close-btn" onclick="closeAdminAccessModal()">&times;</button>
+            </div>
+            <form id="admin-access-form" onsubmit="verifyAdminAccess(event)">
+                <div class="form-group">
+                    <label for="admin-access-code">الرمز السري</label>
+                    <input type="password" id="admin-access-code" required placeholder="أدخل الرمز السري" autofocus>
+                    <small class="form-hint">أدخل الرمز السري للوصول إلى لوحة التحكم</small>
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="btn btn-primary btn-block">دخول</button>
+                    <button type="button" class="btn btn-secondary btn-block"
+                        onclick="closeAdminAccessModal()">إلغاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal استعادة كلمة المرور -->
+    <div id="forgot-password-modal" class="modal">
+        <div class="modal-content" style="max-width: 400px;">
+            <div class="modal-header">
+                <h3>� استعادة كلمة المرور</h3>
+                <button class="close-btn" onclick="closeForgotPasswordModal()">&times;</button>
+            </div>
+
+            <!-- الخطوة 1: إدخال البريد -->
+            <div id="forgot-step-1">
+                <form onsubmit="handleForgotPasswordRequest(event)">
+                    <p style="margin-bottom: 15px; font-size: 0.9rem; color: #64748b;">أدخل بريدك الإلكتروني المسجل
+                        وسنرسل لك رمزاً لإعادة ضبط كلمة المرور.</p>
+                    <div class="form-group">
+                        <label for="forgot-email">البريد الإلكتروني</label>
+                        <input type="email" id="forgot-email" required placeholder="example@company.com">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">إرسال الرمز</button>
+                </form>
+            </div>
+
+            <!-- الخطوة 2: إدخال الرمز وكلمة المرور الجديدة -->
+            <div id="forgot-step-2" style="display: none;">
+                <form onsubmit="handleResetPassword(event)">
+                    <p style="margin-bottom: 15px; font-size: 0.9rem; color: #64748b;">تم إرسال الرمز إلى بريدك (محاكاة:
+                        الرمز هو 1234). أدخل الرمز وكلمة المرور الجديدة.</p>
+                    <div class="form-group">
+                        <label for="reset-code">رمز التحقق</label>
+                        <input type="text" id="reset-code" required placeholder="1234">
+                    </div>
+                    <div class="form-group">
+                        <label for="new-reset-password">كلمة المرور الجديدة</label>
+                        <input type="password" id="new-reset-password" required minlength="8" placeholder="••••••••">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">تغيير كلمة المرور</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- صفحة التسجيل -->
+    <div id="register-page" class="page">
+        <div class="auth-container">
+            <div class="auth-card">
+                <button class="back-btn" onclick="showLandingPage()">← العودة</button>
+                <div class="auth-header">
+                    <h2>تسجيل حساب جديد</h2>
+                    <p>انضم إلى MAP Supplies وابدأ التوريد الآن</p>
+                </div>
+                <form id="register-form" onsubmit="handleRegister(event)">
+                    <div class="form-group">
+                        <label for="company-name">اسم الشركة *</label>
+                        <input type="text" id="company-name" required minlength="3"
+                            placeholder="شركة التوريدات المتحدة">
+                    </div>
+                    <div class="form-group">
+                        <label for="phone">رقم الهاتف *</label>
+                        <input type="tel" id="phone" required pattern="^(\+20|0)?1[0125][0-9]{8}$"
+                            placeholder="+201234567890">
+                        <small class="form-hint">مثال: +201234567890 أو 01234567890</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-email">البريد الإلكتروني *</label>
+                        <input type="email" id="register-email" required placeholder="info@company.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="tax-number">الرقم الضريبي *</label>
+                        <input type="text" id="tax-number" required minlength="9" placeholder="123-456-789">
+                    </div>
+                    <div class="form-group">
+                        <label for="address">العنوان التفصيلي *</label>
+                        <input type="text" id="address" required
+                            placeholder="مثال: القاهرة، مدينة نصر، شارع عباس العقاد">
+                    </div>
+                    <div class="form-group">
+                        <label for="whatsapp-phone">رقم الواتساب *</label>
+                        <input type="tel" id="whatsapp-phone" required pattern="^(\+20|0)?1[0125][0-9]{8}$"
+                            placeholder="مثال: 01234567890">
+                        <small class="form-hint">يستخدم لإرسال عروض الأسعار والتواصل السريع</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-password">كلمة المرور *</label>
+                        <input type="password" id="register-password" required minlength="8" placeholder="••••••••">
+                        <small class="form-hint">8 أحرف على الأقل</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirm-password">تأكيد كلمة المرور *</label>
+                        <input type="password" id="confirm-password" required minlength="8" placeholder="••••••••">
+                    </div>
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="terms" required>
+                            <span>أوافق على <a href="#" class="link">الشروط والأحكام</a></span>
+                        </label>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">إنشاء الحساب</button>
+                </form>
+                <div class="auth-footer">
+                    <p>لديك حساب بالفعل؟ <a href="#" class="link" onclick="showLoginPage()">سجل الدخول</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- لوحة تحكم العميل -->
+    <div id="customer-dashboard" class="page">
+        <header class="dashboard-header">
+            <div class="container">
+                <div class="logo">
+                    <img src="6024030016393382674.jpg" alt="MAP Supplies Logo" class="logo-img">
+                </div>
+                <nav class="dashboard-nav">
+                    <a href="#" class="nav-link active" onclick="showCustomerSection('home')">الرئيسية</a>
+                    <a href="#" class="nav-link" onclick="showCustomerSection('new-order')">طلب جديد</a>
+                    <a href="#" class="nav-link" onclick="showCustomerSection('my-orders')">طلباتي</a>
+                    <a href="#" class="nav-link" onclick="showCustomerSection('cart')">السلة <span class="badge"
+                            id="cart-badge">0</span></a>
+                    <a href="#" class="nav-link" onclick="showCustomerSection('settings')">الإعدادات</a>
+                </nav>
+                <div class="user-menu">
+                    <span class="user-name" id="customer-name">مرحباً</span>
+                    <button class="btn btn-secondary btn-sm" onclick="handleLogout()">تسجيل الخروج</button>
+                </div>
+            </div>
+        </header>
+
+        <main class="dashboard-main">
+            <!-- قسم الرئيسية -->
+            <section id="customer-home" class="dashboard-section active">
+                <div class="container">
+                    <h2 class="page-title">لوحة التحكم</h2>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">📋</div>
+                            <div class="stat-content">
+                                <h3 id="total-orders-stat">0</h3>
+                                <p>إجمالي الطلبات</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">⏳</div>
+                            <div class="stat-content">
+                                <h3 id="pending-orders-stat">0</h3>
+                                <p>طلبات معلقة</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">✅</div>
+                            <div class="stat-content">
+                                <h3 id="completed-orders-stat">0</h3>
+                                <p>طلبات مكتملة</p>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">🛒</div>
+                            <div class="stat-content">
+                                <h3 id="cart-items-stat">0</h3>
+                                <p>منتجات في السلة</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="recent-orders">
+                        <h3>آخر الطلبات</h3>
+                        <div id="recent-orders-list" class="orders-list">
+                            <p class="empty-state">لا توجد طلبات حتى الآن</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- قسم طلب جديد -->
+            <section id="customer-new-order" class="dashboard-section">
+                <div class="container">
+                    <div class="order-layout">
+                        <aside class="categories-sidebar">
+                            <h3>فئات المنتجات</h3>
+                            <div class="categories-list">
+                                <button class="category-item active" onclick="selectCategory('all')">
+                                    <span>📦</span> جميع الفئات
+                                </button>
+                                <button class="category-item" onclick="selectCategory('electronics')">
+                                    <span>💻</span> إلكترونيات
+                                </button>
+                                <button class="category-item" onclick="selectCategory('furniture')">
+                                    <span>🪑</span> أثاث
+                                </button>
+                                <button class="category-item" onclick="selectCategory('office')">
+                                    <span>📎</span> مستلزمات مكتبية
+                                </button>
+                                <button class="category-item" onclick="selectCategory('industrial')">
+                                    <span>🏭</span> معدات صناعية
+                                </button>
+                                <button class="category-item" onclick="selectCategory('food')">
+                                    <span>🍽️</span> مواد غذائية
+                                </button>
+                                <button class="category-item" onclick="selectCategory('medical')">
+                                    <span>⚕️</span> مستلزمات طبية
+                                </button>
+                                <button class="category-item" onclick="selectCategory('other')">
+                                    <span>📌</span> أخرى
+                                </button>
+                            </div>
+                        </aside>
+                        <div class="order-form-container">
+                            <h2 class="page-title">إضافة منتج جديد</h2>
+                            <form id="new-order-form" onsubmit="addToCart(event)">
+                                <div class="form-group">
+                                    <label for="product-name">اسم المنتج *</label>
+                                    <input type="text" id="product-name" required list="product-suggestions"
+                                        placeholder="أدخل اسم المنتج">
+                                    <datalist id="product-suggestions">
+                                        <option value="كراسي مكتبية">
+                                        <option value="طابعات ليزر">
+                                        <option value="أجهزة كمبيوتر">
+                                        <option value="مكاتب خشبية">
+                                        <option value="أدوات كتابة">
+                                    </datalist>
+                                </div>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label for="quantity">الكمية *</label>
+                                        <input type="number" id="quantity" required min="1" value="1" placeholder="1">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="product-type">النوع *</label>
+                                        <input type="text" id="product-type" required
+                                            placeholder="مثال: معدن، بلاستيك، قياس خاص">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label for="product-notes">ملاحظات إضافية</label>
+                                    <textarea id="product-notes" rows="3"
+                                        placeholder="أي تفاصيل أخرى تود إضافتها"></textarea>
+                                </div>
+                                <div class="form-group">
+                                    <label for="product-image">صورة المنتج</label>
+                                    <input type="file" id="product-image" accept="image/*"
+                                        onchange="previewImage(event)">
+                                    <div id="image-preview" class="image-preview"></div>
+                                </div>
+                                <div class="form-actions">
+                                    <button type="submit" class="btn btn-primary">إضافة للسلة</button>
+                                    <button type="button" class="btn btn-secondary" onclick="resetOrderForm()">إعادة
+                                        تعيين</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- قسم طلباتي -->
+            <section id="customer-my-orders" class="dashboard-section">
+                <div class="container">
+                    <h2 class="page-title">طلباتي</h2>
+                    <div class="orders-filter">
+                        <select id="orders-status-filter" onchange="filterOrders()">
+                            <option value="all">جميع الحالات</option>
+                            <option value="pending">معلق</option>
+                            <option value="reviewing">قيد المراجعة</option>
+                            <option value="quoted">مسعر</option>
+                            <option value="approved">موافق عليه</option>
+                            <option value="preparing">قيد التحضير</option>
+                            <option value="shipped">مشحون</option>
+                            <option value="delivered">مسلم</option>
+                            <option value="cancelled">ملغي</option>
+                        </select>
+                    </div>
+                    <div id="orders-list" class="orders-list">
+                        <p class="empty-state">لا توجد طلبات</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- قسم السلة -->
+            <section id="customer-cart" class="dashboard-section">
+                <div class="container">
+                    <h2 class="page-title">سلة التسوق</h2>
+                    <div id="cart-items" class="cart-items">
+                        <p class="empty-state">السلة فارغة</p>
+                    </div>
+                    <div id="cart-summary" class="cart-summary" style="display: none;">
+                        <div class="summary-row">
+                            <span>عدد المنتجات:</span>
+                            <span id="cart-total-items">0</span>
+                        </div>
+                        <button class="btn btn-primary btn-block" onclick="submitOrder()">إرسال الطلب</button>
+                        <button class="btn btn-secondary btn-block" onclick="clearCart()">إفراغ السلة</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- قسم الإعدادات -->
+            <section id="customer-settings" class="dashboard-section">
+                <div class="container">
+                    <h2 class="page-title">إعدادات الحساب</h2>
+                    <div class="settings-card">
+                        <h3>معلومات الشركة</h3>
+                        <form id="settings-form" onsubmit="updateSettings(event)">
+                            <div class="form-group">
+                                <label for="settings-company">اسم الشركة</label>
+                                <input type="text" id="settings-company" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="settings-phone">رقم الهاتف</label>
+                                <input type="tel" id="settings-phone" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="settings-email">البريد الإلكتروني</label>
+                                <input type="email" id="settings-email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="settings-tax">الرقم الضريبي</label>
+                                <input type="text" id="settings-tax" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">حفظ التغييرات</button>
+                        </form>
+                    </div>
+                    <div class="settings-card">
+                        <h3>تغيير كلمة المرور</h3>
+                        <form id="password-form" onsubmit="changePassword(event)">
+                            <div class="form-group">
+                                <label for="current-password">كلمة المرور الحالية</label>
+                                <input type="password" id="current-password" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="new-password">كلمة المرور الجديدة</label>
+                                <input type="password" id="new-password" required minlength="8">
+                            </div>
+                            <div class="form-group">
+                                <label for="confirm-new-password">تأكيد كلمة المرور الجديدة</label>
+                                <input type="password" id="confirm-new-password" required minlength="8">
+                            </div>
+                            <button type="submit" class="btn btn-primary">تغيير كلمة المرور</button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Toast للإشعارات -->
+    <div id="toast" class="toast"></div>
+
+    <script src="db.js"></script>
+    <script src="script.js"></script>
+</body>
+
+</html>
