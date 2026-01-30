@@ -27,30 +27,36 @@ document.addEventListener('DOMContentLoaded', async function () {
 });
 
 async function initializeApp() {
-    // تهيئة قاعدة البيانات
-    if (typeof MAP_DB !== 'undefined') {
-        await MAP_DB.init();
-    }
+    // تهيئة قواعد البيانات
+    if (typeof MAP_DB !== 'undefined') await MAP_DB.init();
+    if (typeof MAP_CLOUD !== 'undefined') await MAP_CLOUD.init();
 
-    // تحميل البيانات من Local Storage
-    loadFromStorage();
+    // تحميل البيانات
+    await loadFromStorage();
 
-    // تهيئة EmailJS بمفتاحك العام الحقيقي
+    // تهيئة EmailJS
     if (typeof emailjs !== 'undefined') {
         emailjs.init("vcHKe7GLjFyqTEKti");
     }
 
-    // إضافة بيانات تجريبية فقط إذا لم يكن هناك أي بيانات مسجلة مسبقاً (أول مرة تشغيل)
-    if (localStorage.getItem('admin_customers') === null) {
+    // إضافة بيانات تجريبية (للسحابة إذا كانت فارغة)
+    const checkCustomers = await MAP_CLOUD.getAll('customers');
+    if (checkCustomers.length === 0) {
         addSampleData();
     }
 }
 
-function loadFromStorage() {
-    // تحميل السلة الخاصة بالعميل فقط
-    cart = JSON.parse(localStorage.getItem('customer_cart')) || [];
-    // تحميل الفئات من الإدارة
-    categories = JSON.parse(localStorage.getItem('admin_categories')) || categories;
+async function loadFromStorage() {
+    // تحميل السلة الخاصة بالعميل فقط (محلياً)
+    cart = JSON.parse(localStorage.getItem('customer_cart')) ?? [];
+
+    // تحميل البيانات المشتركة من السحابة
+    if (typeof MAP_CLOUD !== 'undefined') {
+        const cloudCats = await MAP_CLOUD.getSetting('admin_categories');
+        if (cloudCats) categories = cloudCats;
+    } else {
+        categories = JSON.parse(localStorage.getItem('admin_categories')) ?? categories;
+    }
 }
 
 function saveCart() {
@@ -62,19 +68,25 @@ function saveCart() {
     }
 }
 
-function addSampleData() {
-    // إضافة عميل تجريبي في بيانات الإدارة
-    const customers = [{
+async function addSampleData() {
+    // إضافة عميل تجريبي في السحابة
+    const sampleCustomer = {
         id: generateId(),
         companyName: 'شركة التوريدات المتحدة',
         phone: '+201234567890',
-        email: 'test@company.com',
+        email: 'test@map.com',
+        password: '123',
         taxNumber: '123-456-789',
-        password: 'test1234',
+        address: 'القاهرة، مصر',
+        whatsappPhone: '+201234567890',
         createdAt: new Date().toISOString(),
         isBlocked: false
-    }];
-    localStorage.setItem('admin_customers', JSON.stringify(customers));
+    };
+
+    if (typeof MAP_CLOUD !== 'undefined') {
+        await MAP_CLOUD.save('customers', sampleCustomer);
+        await MAP_CLOUD.setSetting('admin_categories', categories);
+    }
 }
 
 // ===== إدارة الجلسات =====

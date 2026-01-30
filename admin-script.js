@@ -30,34 +30,47 @@ let notificationTemplate = 'مرحباً [اسم العميل]، تم إضافة
 
 // ===== تهيئة التطبيق =====
 document.addEventListener('DOMContentLoaded', async function () {
-    // تهيئة قاعدة البيانات أولاً
-    if (typeof MAP_DB !== 'undefined') {
-        await MAP_DB.init();
-    }
+    // تهيئة قاعدة البيانات المحلية والسحابية
+    if (typeof MAP_DB !== 'undefined') await MAP_DB.init();
+    if (typeof MAP_CLOUD !== 'undefined') await MAP_CLOUD.init();
 
-    loadFromStorage();
+    await loadFromStorage();
     checkAdminSession();
 
-    // تهيئة EmailJS في لوحة الإدارة بالمفتاح الحقيقي
+    // تهيئة EmailJS
     if (typeof emailjs !== 'undefined') {
         emailjs.init("vcHKe7GLjFyqTEKti");
     }
 });
 
-// ===== تحميل البيانات من Local Storage =====
-function loadFromStorage() {
-    orders = JSON.parse(localStorage.getItem('admin_orders')) ?? [];
-    customers = JSON.parse(localStorage.getItem('admin_customers')) ?? [];
-    supervisors = JSON.parse(localStorage.getItem('admin_supervisors')) ?? [];
-    notifications = JSON.parse(localStorage.getItem('admin_notifications')) ?? [];
-    quotes = JSON.parse(localStorage.getItem('admin_quotes')) ?? [];
-    categories = JSON.parse(localStorage.getItem('admin_categories')) ?? categories;
-    notificationTemplate = localStorage.getItem('admin_notificationTemplate') ?? notificationTemplate;
+// ===== تحميل البيانات من السحابة (Firebase) و Local Storage =====
+async function loadFromStorage() {
+    // محاولة التحميل من السحابة أولاً للربط بين الأجهزة
+    if (typeof MAP_CLOUD !== 'undefined') {
+        orders = await MAP_CLOUD.getAll('orders');
+        customers = await MAP_CLOUD.getAll('customers');
+        supervisors = await MAP_CLOUD.getAll('supervisors');
+        notifications = await MAP_CLOUD.getAll('notifications');
+        quotes = await MAP_CLOUD.getAll('quotes');
+        const cloudCats = await MAP_CLOUD.getSetting('admin_categories');
+        if (cloudCats) categories = cloudCats;
+        const cloudTemplate = await MAP_CLOUD.getSetting('admin_notificationTemplate');
+        if (cloudTemplate) notificationTemplate = cloudTemplate;
+    } else {
+        // Fallback للـ LocalStorage في حالة عدم وجود إنترنت
+        orders = JSON.parse(localStorage.getItem('admin_orders')) ?? [];
+        customers = JSON.parse(localStorage.getItem('admin_customers')) ?? [];
+        supervisors = JSON.parse(localStorage.getItem('admin_supervisors')) ?? [];
+        notifications = JSON.parse(localStorage.getItem('admin_notifications')) ?? [];
+        quotes = JSON.parse(localStorage.getItem('admin_quotes')) ?? [];
+        categories = JSON.parse(localStorage.getItem('admin_categories')) ?? categories;
+        notificationTemplate = localStorage.getItem('admin_notificationTemplate') ?? notificationTemplate;
+    }
 }
 
 function saveToStorage() {
     try {
-        // الحفظ في LocalStorage للتوافق السريع
+        // 1. الحفظ في LocalStorage للتوافق السريع
         localStorage.setItem('admin_orders', JSON.stringify(orders));
         localStorage.setItem('admin_customers', JSON.stringify(customers));
         localStorage.setItem('admin_supervisors', JSON.stringify(supervisors));
@@ -65,18 +78,27 @@ function saveToStorage() {
         localStorage.setItem('admin_quotes', JSON.stringify(quotes));
         localStorage.setItem('admin_categories', JSON.stringify(categories));
 
-        // الحفظ العميق في قاعدة البيانات (IndexedDB) للنسخ الاحتياطي والأمان
+        // 2. المزامنة السحابية (Firebase) للربط العالمي
+        if (typeof MAP_CLOUD !== 'undefined') {
+            orders.forEach(o => MAP_CLOUD.save('orders', o));
+            customers.forEach(c => MAP_CLOUD.save('customers', c));
+            supervisors.forEach(s => MAP_CLOUD.save('supervisors', s));
+            notifications.forEach(n => MAP_CLOUD.save('notifications', n));
+            quotes.forEach(q => MAP_CLOUD.save('quotes', q));
+            MAP_CLOUD.setSetting('admin_categories', categories);
+            MAP_CLOUD.setSetting('admin_notificationTemplate', notificationTemplate);
+        }
+
+        // 3. الحفظ المحلي الاحتياطي (IndexedDB)
         if (typeof MAP_DB !== 'undefined' && MAP_DB.db) {
             orders.forEach(o => MAP_DB.save('orders', o));
             customers.forEach(c => MAP_DB.save('customers', c));
             supervisors.forEach(s => MAP_DB.save('supervisors', s));
             notifications.forEach(n => MAP_DB.save('notifications', n));
             quotes.forEach(q => MAP_DB.save('quotes', q));
-            MAP_DB.setSetting('admin_categories', categories);
         }
     } catch (e) {
         console.error('فشل حفظ البيانات:', e);
-        showToast('خطأ: لم يتم حفظ البيانات بالكامل.', 'error');
     }
 }
 
