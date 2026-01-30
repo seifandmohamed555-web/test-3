@@ -204,7 +204,7 @@ function handleLogin(event) {
 }
 
 // ===== التسجيل =====
-function handleRegister(event) {
+async function handleRegister(event) {
     event.preventDefault();
 
     const companyName = document.getElementById('company-name').value;
@@ -246,9 +246,9 @@ function handleRegister(event) {
     customers.push(newCustomer);
     localStorage.setItem('admin_customers', JSON.stringify(customers));
 
-    // حفظ في قاعدة البيانات الاحترافية
-    if (typeof MAP_DB !== 'undefined' && MAP_DB.db) {
-        MAP_DB.save('customers', newCustomer);
+    // حفظ في السحابة (Firebase) للربط العالمي
+    if (typeof MAP_CLOUD !== 'undefined') {
+        await MAP_CLOUD.save('customers', newCustomer);
     }
 
     showToast('تم إنشاء الحساب بنجاح! يمكنك الآن تسجيل الدخول.', 'success');
@@ -452,7 +452,7 @@ function clearCart() {
 }
 
 // ===== إرسال الطلب =====
-function submitOrder() {
+async function submitOrder() {
     if (cart.length === 0) {
         showToast('السلة فارغة', 'error');
         return;
@@ -473,9 +473,9 @@ function submitOrder() {
     orders.push(order);
     localStorage.setItem('admin_orders', JSON.stringify(orders));
 
-    // حفظ في قاعدة البيانات الاحترافية
-    if (typeof MAP_DB !== 'undefined' && MAP_DB.db) {
-        MAP_DB.save('orders', order);
+    // حفظ في السحابة (Firebase) للربط العالمي
+    if (typeof MAP_CLOUD !== 'undefined') {
+        await MAP_CLOUD.save('orders', order);
     }
 
     cart = [];
@@ -591,7 +591,7 @@ function createOrderCard(order) {
 }
 
 // ===== قبول عرض السعر =====
-function acceptQuote(quoteId, orderId) {
+async function acceptQuote(quoteId, orderId) {
     const quotes = JSON.parse(localStorage.getItem('admin_quotes')) || [];
     const quote = quotes.find(q => q.id === quoteId);
 
@@ -605,15 +605,15 @@ function acceptQuote(quoteId, orderId) {
             order.status = 'approved';
             localStorage.setItem('admin_orders', JSON.stringify(orders));
 
-            // تحديث قاعدة البيانات الاحترافية
-            if (typeof MAP_DB !== 'undefined' && MAP_DB.db) {
-                MAP_DB.save('orders', order);
+            // تحديث السحابة (Firebase) للربط العالمي
+            if (typeof MAP_CLOUD !== 'undefined') {
+                await MAP_CLOUD.save('orders', order);
             }
         }
 
-        // تحديث قاعدة البيانات الاحترافية
-        if (typeof MAP_DB !== 'undefined' && MAP_DB.db) {
-            MAP_DB.save('quotes', quote);
+        // تحديث السحابة (Firebase) للربط العالمي
+        if (typeof MAP_CLOUD !== 'undefined') {
+            await MAP_CLOUD.save('quotes', quote);
         }
 
         loadCustomerOrders();
@@ -622,7 +622,7 @@ function acceptQuote(quoteId, orderId) {
 }
 
 // ===== رفض عرض السعر =====
-function rejectQuote(quoteId) {
+async function rejectQuote(quoteId) {
     const quotes = JSON.parse(localStorage.getItem('admin_quotes')) || [];
     const quote = quotes.find(q => q.id === quoteId);
 
@@ -630,9 +630,9 @@ function rejectQuote(quoteId) {
         quote.status = 'rejected';
         localStorage.setItem('admin_quotes', JSON.stringify(quotes));
 
-        // تحديث قاعدة البيانات الاحترافية
-        if (typeof MAP_DB !== 'undefined' && MAP_DB.db) {
-            MAP_DB.save('quotes', quote);
+        // تحديث السحابة (Firebase) للربط العالمي
+        if (typeof MAP_CLOUD !== 'undefined') {
+            await MAP_CLOUD.save('quotes', quote);
         }
 
         loadCustomerOrders();

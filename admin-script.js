@@ -68,7 +68,7 @@ async function loadFromStorage() {
     }
 }
 
-function saveToStorage() {
+async function saveToStorage() {
     try {
         // 1. الحفظ في LocalStorage للتوافق السريع
         localStorage.setItem('admin_orders', JSON.stringify(orders));
@@ -78,15 +78,18 @@ function saveToStorage() {
         localStorage.setItem('admin_quotes', JSON.stringify(quotes));
         localStorage.setItem('admin_categories', JSON.stringify(categories));
 
-        // 2. المزامنة السحابية (Firebase) للربط العالمي
+        // 2. المزامنة السحابية (Firebase) للربط العالمي - استخدام Promise.all للسرعة
         if (typeof MAP_CLOUD !== 'undefined') {
-            orders.forEach(o => MAP_CLOUD.save('orders', o));
-            customers.forEach(c => MAP_CLOUD.save('customers', c));
-            supervisors.forEach(s => MAP_CLOUD.save('supervisors', s));
-            notifications.forEach(n => MAP_CLOUD.save('notifications', n));
-            quotes.forEach(q => MAP_CLOUD.save('quotes', q));
-            MAP_CLOUD.setSetting('admin_categories', categories);
-            MAP_CLOUD.setSetting('admin_notificationTemplate', notificationTemplate);
+            const saves = [
+                ...orders.map(o => MAP_CLOUD.save('orders', o)),
+                ...customers.map(c => MAP_CLOUD.save('customers', c)),
+                ...supervisors.map(s => MAP_CLOUD.save('supervisors', s)),
+                ...notifications.map(n => MAP_CLOUD.save('notifications', n)),
+                ...quotes.map(q => MAP_CLOUD.save('quotes', q)),
+                MAP_CLOUD.setSetting('admin_categories', categories),
+                MAP_CLOUD.setSetting('admin_notificationTemplate', notificationTemplate)
+            ];
+            await Promise.all(saves);
         }
 
         // 3. الحفظ المحلي الاحتياطي (IndexedDB)
