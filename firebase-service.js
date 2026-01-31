@@ -1,11 +1,7 @@
 /* ========================================
-   MAP Supplies - Cloud Database Service (Firebase)
-   نظام قاعدة بيانات سحابية للربط بين جميع الأجهزة
+   MAP Supplies - Cloud Database Service (Compat Version)
+   نظام قاعدة بيانات سحابية متوافق كلياً مع جميع الأجهزة
    ======================================== */
-
-// استيراد مكتبات Firebase من CDN
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, collection, doc, setDoc, getDoc, getDocs, updateDoc, deleteDoc, query, where, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // إعدادات Firebase الخاصة بك
 const firebaseConfig = {
@@ -17,29 +13,23 @@ const firebaseConfig = {
     appId: "1:202719020016:web:83a58cac471d2468139335"
 };
 
-// تهيئة Firebase
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+// تهيئة Firebase في النطاق العالمي
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
 class MapCloudDatabase {
     constructor() {
         this.db = db;
     }
 
-    /**
-     * حفظ تعليمة برمجية لضمان عمل الخدمة
-     */
     async init() {
-        console.log("Firebase Cloud Database Connected ✅");
+        console.log("Firebase Cloud Connected Globally ✅");
         return true;
     }
 
-    /**
-     * جلب جميع المستندات من مجموعة معينة
-     */
     async getAll(collectionName) {
         try {
-            const querySnapshot = await getDocs(collection(this.db, collectionName));
+            const querySnapshot = await this.db.collection(collectionName).get();
             return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
         } catch (error) {
             console.error(`Error getting ${collectionName}: `, error);
@@ -47,68 +37,45 @@ class MapCloudDatabase {
         }
     }
 
-    /**
-     * جلب مستند واحد بالمعرف
-     */
     async getById(collectionName, id) {
         try {
-            const docRef = doc(this.db, collectionName, id);
-            const docSnap = await getDoc(docRef);
-            return docSnap.exists() ? { id: docSnap.id, ...docSnap.data() } : null;
+            const doc = await this.db.collection(collectionName).doc(id).get();
+            return doc.exists ? { id: doc.id, ...doc.data() } : null;
         } catch (error) {
-            console.error(`Error getting document ${id}: `, error);
             return null;
         }
     }
 
-    /**
-     * إضافة أو تحديث مستند
-     */
     async save(collectionName, data) {
         try {
-            // نستخدم المعرف الموجود في البيانات كمعرف للمستند في Firebase
-            const id = data.id;
-            if (!id) throw new Error("Document ID is required");
-
-            const docRef = doc(this.db, collectionName, id);
-            await setDoc(docRef, data, { merge: true });
+            if (!data.id) throw new Error("ID required");
+            await this.db.collection(collectionName).doc(data.id).set(data, { merge: true });
             return true;
         } catch (error) {
-            console.error("Error saving document: ", error);
+            console.error("Save error: ", error);
             return false;
         }
     }
 
-    /**
-     * حذف مستند
-     */
     async delete(collectionName, id) {
         try {
-            await deleteDoc(doc(this.db, collectionName, id));
+            await this.db.collection(collectionName).doc(id).delete();
             return true;
         } catch (error) {
-            console.error("Error deleting document: ", error);
             return false;
         }
     }
 
-    /**
-     * مراقبة التغييرات الحية (Real-time)
-     * تستخدم لتحديث الواجهة فور حدوث تغيير عند مستخدم آخر
-     */
     subscribe(collectionName, callback) {
-        return onSnapshot(collection(this.db, collectionName), (snapshot) => {
+        return this.db.collection(collectionName).onSnapshot((snapshot) => {
             const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             callback(data);
         });
     }
 
-    /**
-     * حفظ الإعدادات وقوالب الرسائل
-     */
     async setSetting(key, value) {
         try {
-            await setDoc(doc(this.db, 'settings', key), { value });
+            await this.db.collection('settings').doc(key).set({ value });
             return true;
         } catch (error) {
             return false;
@@ -116,11 +83,14 @@ class MapCloudDatabase {
     }
 
     async getSetting(key) {
-        const docSnap = await getDoc(doc(this.db, 'settings', key));
-        return docSnap.exists() ? docSnap.data().value : null;
+        try {
+            const doc = await this.db.collection('settings').doc(key).get();
+            return doc.exists ? doc.data().value : null;
+        } catch (error) {
+            return null;
+        }
     }
 }
 
-// تصدير نسخة عالمية للعمل في كل الصفحات
-const MAP_CLOUD = new MapCloudDatabase();
-window.MAP_CLOUD = MAP_CLOUD;
+// جعل المحرك متاحاً بشكل عالمي وفوري
+window.MAP_CLOUD = new MapCloudDatabase();

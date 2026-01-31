@@ -37,11 +37,20 @@ document.addEventListener('DOMContentLoaded', async function () {
     await loadFromStorage();
     checkAdminSession();
 
+    // مراقبة البيانات لحظياً من السحابة لتحديث اللوحة فوراً
+    if (typeof MAP_CLOUD !== 'undefined') {
+        MAP_CLOUD.subscribe('orders', (data) => { orders = data; updateAdminStats(); loadRecentActivity(); if (activeSection === 'orders') loadAdminOrders(); });
+        MAP_CLOUD.subscribe('customers', (data) => { customers = data; updateAdminStats(); if (activeSection === 'customers') loadCustomersList(); });
+        MAP_CLOUD.subscribe('quotes', (data) => { quotes = data; });
+    }
+
     // تهيئة EmailJS
     if (typeof emailjs !== 'undefined') {
         emailjs.init("vcHKe7GLjFyqTEKti");
     }
 });
+
+let activeSection = 'dashboard';
 
 // ===== تحميل البيانات من السحابة (Firebase) و Local Storage =====
 async function loadFromStorage() {
@@ -285,6 +294,8 @@ function showAdminSection(sectionId) {
     // تفعيل الرابط المناسب في القائمة
     const activeLink = document.getElementById('nav-' + sectionId);
     if (activeLink) activeLink.classList.add('active');
+
+    activeSection = sectionId;
 
     if (sectionId === 'orders') {
         loadAdminOrders();

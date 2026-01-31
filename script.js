@@ -34,15 +34,20 @@ async function initializeApp() {
     // تحميل البيانات
     await loadFromStorage();
 
+    // مراقبة الفئات لحظياً من السحابة لتظهر التعديلات فوراً للجميع
+    if (typeof MAP_CLOUD !== 'undefined') {
+        MAP_CLOUD.subscribe('settings', (settings) => {
+            const catSetting = settings.find(s => s.id === 'admin_categories');
+            if (catSetting) {
+                categories = catSetting.value;
+                if (typeof renderCategories === 'function') renderCategories();
+            }
+        });
+    }
+
     // تهيئة EmailJS
     if (typeof emailjs !== 'undefined') {
         emailjs.init("vcHKe7GLjFyqTEKti");
-    }
-
-    // إضافة بيانات تجريبية (للسحابة إذا كانت فارغة)
-    const checkCustomers = await MAP_CLOUD.getAll('customers');
-    if (checkCustomers.length === 0) {
-        addSampleData();
     }
 }
 
@@ -179,15 +184,19 @@ function showCustomerSection(sectionId) {
 }
 
 // ===== تسجيل الدخول =====
-function handleLogin(event) {
+async function handleLogin(event) {
     event.preventDefault();
 
     const email = document.getElementById('login-email').value;
     const password = document.getElementById('login-password').value;
 
-    // التحقق من العملاء فقط
-    const customers = JSON.parse(localStorage.getItem('admin_customers')) || [];
-    const customer = customers.find(c => c.email === email && c.password === password);
+    // جلب أحدث قائمة عملاء من السحابة لضمان إمكانية الدخول من أي جهاز
+    let cloudCustomers = [];
+    if (typeof MAP_CLOUD !== 'undefined') {
+        cloudCustomers = await MAP_CLOUD.getAll('customers');
+    }
+
+    const customer = cloudCustomers.find(c => c.email === email && c.password === password);
 
     if (customer) {
         if (customer.isBlocked) {
