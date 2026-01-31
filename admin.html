@@ -151,7 +151,11 @@
             <!-- قسم لوحة التحكم -->
             <section id="admin-dashboard" class="dashboard-section active">
                 <div class="container">
-                    <h2 class="page-title">الإحصائيات</h2>
+                    <div class="page-header-flex">
+                        <h2 class="page-title">الإحصائيات</h2>
+                        <button class="refresh-btn" onclick="refreshAdminData('dashboard')"
+                            title="تحديث البيانات">🔄</button>
+                    </div>
                     <div class="stats-grid">
                         <div class="stat-card">
                             <div class="stat-icon">📋</div>
@@ -226,7 +230,11 @@
             <!-- قسم إدارة الطلبات -->
             <section id="admin-orders" class="dashboard-section">
                 <div class="container">
-                    <h2 class="page-title">إدارة الطلبات</h2>
+                    <div class="page-header-flex">
+                        <h2 class="page-title">إدارة الطلبات</h2>
+                        <button class="refresh-btn" onclick="refreshAdminData('orders')"
+                            title="تحديث البيانات">🔄</button>
+                    </div>
                     <div class="filters-bar">
                         <input type="text" id="admin-search" placeholder="بحث برقم الطلب أو اسم العميل"
                             onkeyup="searchOrders()">
@@ -253,7 +261,11 @@
             <!-- قسم العملاء -->
             <section id="admin-customers" class="dashboard-section">
                 <div class="container">
-                    <h2 class="page-title">إدارة العملاء</h2>
+                    <div class="page-header-flex">
+                        <h2 class="page-title">إدارة العملاء</h2>
+                        <button class="refresh-btn" onclick="refreshAdminData('customers')"
+                            title="تحديث البيانات">🔄</button>
+                    </div>
                     <div class="filters-bar">
                         <input type="text" id="customers-search" placeholder="بحث باسم الشركة أو البريد الإلكتروني"
                             onkeyup="searchCustomers()">
@@ -272,8 +284,15 @@
             <!-- قسم المشرفين -->
             <section id="admin-supervisors" class="dashboard-section">
                 <div class="container">
-                    <h2 class="page-title">إدارة المشرفين الفرعيين</h2>
-                    <button class="btn btn-primary" onclick="showAddSupervisorModal()">+ إضافة مشرف جديد</button>
+                    <div class="page-header-flex">
+                        <h2 class="page-title">إدارة المشرفين الفرعيين</h2>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="refresh-btn" onclick="refreshAdminData('supervisors')"
+                                title="تحديث البيانات">🔄</button>
+                            <button class="btn btn-primary" onclick="showAddSupervisorModal()">+ إضافة مشرف
+                                جديد</button>
+                        </div>
+                    </div>
                     <div id="supervisors-list" class="supervisors-list">
                         <p class="empty-state">لا يوجد مشرفين</p>
                     </div>
@@ -283,7 +302,11 @@
             <!-- قسم الإشعارات -->
             <section id="admin-notifications" class="dashboard-section">
                 <div class="container">
-                    <h2 class="page-title">سجل الإشعارات</h2>
+                    <div class="page-header-flex">
+                        <h2 class="page-title">سجل الإشعارات</h2>
+                        <button class="refresh-btn" onclick="refreshAdminData('notifications')"
+                            title="تحديث البيانات">🔄</button>
+                    </div>
                     <div class="notification-settings">
                         <h3>إعدادات الرسائل</h3>
                         <form id="notification-template-form" onsubmit="saveNotificationTemplate(event)">
@@ -312,7 +335,11 @@
             <!-- قسم إدارة الفئات -->
             <section id="admin-categories" class="dashboard-section">
                 <div class="container">
-                    <h2 class="page-title">إدارة فئات المنتجات</h2>
+                    <div class="page-header-flex">
+                        <h2 class="page-title">إدارة فئات المنتجات</h2>
+                        <button class="refresh-btn" onclick="refreshAdminData('categories')"
+                            title="تحديث البيانات">🔄</button>
+                    </div>
                     <div class="settings-card">
                         <h3>إضافة فئة جديدة</h3>
                         <form id="add-category-form" onsubmit="handleAddCategory(event)">
@@ -346,7 +373,11 @@
             <!-- قسم الإعدادات -->
             <section id="admin-settings" class="dashboard-section">
                 <div class="container">
-                    <h2 class="page-title">إعدادات النظام</h2>
+                    <div class="page-header-flex">
+                        <h2 class="page-title">إعدادات النظام</h2>
+                        <button class="refresh-btn" onclick="refreshAdminData('settings')"
+                            title="تحديث البيانات">🔄</button>
+                    </div>
                     <div class="settings-card">
                         <h3>معلومات المنصة</h3>
                         <p><strong>الاسم:</strong> MAP Supplies - توريدات MAP</p>
@@ -365,7 +396,7 @@
 
                     <div class="settings-card">
                         <h3>إدارة البيانات</h3>
-                        <button class="btn btn-secondary" onclick="exportData()">تصدير البيانات (JSON)</button>
+                        <button class="btn btn-secondary" onclick="exportData()">تصدير تقرير الطلبات (PDF)</button>
                         <button class="btn btn-secondary" onclick="clearAllData()" style="margin-top: 8px;">مسح جميع
                             البيانات</button>
                         <small class="form-hint" style="display: block; margin-top: 8px;">تحذير: مسح البيانات لا يمكن
@@ -457,6 +488,10 @@
 
     <!-- Toast للإشعارات -->
     <div id="toast" class="toast"></div>
+
+    <!-- PDF Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>

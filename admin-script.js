@@ -268,6 +268,33 @@ function handleAdminLogout() {
     }
 }
 
+// ===== تحديث البيانات يدوياً من السحابة =====
+async function refreshAdminData(sectionId) {
+    const btn = event?.currentTarget;
+    if (btn) btn.classList.add('spinning');
+
+    try {
+        showToast('جاري مزامنة البيانات مع السحابة...', 'info');
+        await loadFromStorage(); // سحب البيانات من Firebase
+
+        if (sectionId === 'dashboard') {
+            updateAdminStats();
+            loadRecentActivity();
+        } else {
+            showAdminSection(sectionId);
+        }
+
+        setTimeout(() => {
+            if (btn) btn.classList.remove('spinning');
+            showToast('تم تحديث البيانات بنجاح ✅', 'success');
+        }, 600);
+    } catch (error) {
+        console.error('Refresh error:', error);
+        showToast('فشل تحديث البيانات. يرجى التحقق من الاتصال.', 'error');
+        if (btn) btn.classList.remove('spinning');
+    }
+}
+
 // ===== التنقل بين أقسام لوحة التحكم =====
 function showAdminSection(sectionId) {
     // منع المشرف من الوصول لأي قسم بخلاف الطلبات
@@ -969,26 +996,43 @@ function loadSettingsData() {
     document.getElementById('settings-total-notifications').textContent = notifications.length;
 }
 
-// ===== تصدير البيانات =====
+// ===== تصدير البيانات (PDF) =====
 function exportData() {
-    const data = {
-        orders,
-        customers,
-        supervisors,
-        notifications,
-        quotes,
-        exportDate: new Date().toISOString()
-    };
+    try {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
 
-    const dataStr = JSON.stringify(data, null, 2);
-    const dataBlob = new Blob([dataStr], { type: 'application/json' });
-    const url = URL.createObjectURL(dataBlob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `map-supplies-data-${Date.now()}.json`;
-    link.click();
+        // إعدادات الخط والعناوين (استخدام الإنجليزية مؤقتاً لضمان التوافق مع jsPDF الافتراضي)
+        doc.setFontSize(20);
+        doc.text("MAP Supplies - Orders Report", 105, 20, { align: "center" });
+        doc.setFontSize(10);
+        doc.text(`Generated on: ${new Date().toLocaleString()}`, 105, 30, { align: "center" });
 
-    showToast('تم تصدير البيانات بنجاح', 'success');
+        // تحضير بيانات الجدول
+        const tableData = orders.map(order => [
+            order.id.substring(0, 8),
+            order.customerName || 'N/A',
+            `${order.total || 0} EGP`,
+            order.status.toUpperCase(),
+            new Date(order.createdAt).toLocaleDateString()
+        ]);
+
+        // رسم الجدول
+        doc.autoTable({
+            startY: 40,
+            head: [['Order ID', 'Customer', 'Total', 'Status', 'Date']],
+            body: tableData,
+            theme: 'striped',
+            headStyles: { fillColor: [15, 23, 42] }
+        });
+
+        // حفظ الملف
+        doc.save(`map-orders-report-${Date.now()}.pdf`);
+        showToast('تم تصدير تقرير PDF بنجاح', 'success');
+    } catch (error) {
+        console.error('PDF Export Error:', error);
+        showToast('فشل تصدير PDF. يرجى المحاولة لاحقاً.', 'error');
+    }
 }
 
 // ===== مسح جميع البيانات =====
